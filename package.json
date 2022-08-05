@@ -1,0 +1,28 @@
+{
+  "name": "sdc",
+  "version": "1.0.0",
+  "description": "sdc database",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx jest",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rpp36-sdc-utf8/rpp36-joanna-questions.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rpp36-sdc-utf8/rpp36-joanna-questions/issues"
+  },
+  "homepage": "https://github.com/rpp36-sdc-utf8/rpp36-joanna-questions#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "supertest": "^6.2.4"
+  },
+  "devDependencies": {
+    "jest": "^28.1.3",
+    "nodemon": "^2.0.19"
+  }
+}
