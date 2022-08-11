@@ -19,6 +19,7 @@
   "homepage": "https://github.com/rpp36-sdc-utf8/rpp36-joanna-questions#readme",
   "dependencies": {
     "express": "^4.18.1",
+    "mongoose": "^6.5.1",
     "supertest": "^6.2.4"
   },
   "devDependencies": {
