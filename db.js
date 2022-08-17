@@ -5,7 +5,11 @@ async function main() {
 }
 
 
-
+const photosSchema = new mongoose.Schema({
+  id:Number,
+  answer_id:Number,
+  url:String,
+})
 const answersSchema = new mongoose.Schema({
   id:Number,
   body:String,
@@ -29,9 +33,18 @@ const questionsSchema = new mongoose.Schema({
 
 
 });
+const Photos = mongoose.model("Photos",photosSchema);
 const Answers = mongoose.model('Answers',answersSchema);
 const Questions = mongoose.model('Questions',questionsSchema);
 
+let selectAnswers =()=>Answers.findOne();
+
+module.exports ={
+  Photos,
+  Answers,
+  Questions
+
+}
 // const Kitten = mongoose.model('Kitten', kittySchema);
 // const silence = new Kitten({ name: 'Silence' });
 // console.log(silence.name); // 'Silence'
