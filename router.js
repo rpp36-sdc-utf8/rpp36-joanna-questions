@@ -7,7 +7,18 @@ router.get('/qa/questions',(req,res)=>{
 
 })
 router.get('/qa/questions/:question_id/answers', (req, res) => {
-  res.send('Get All answers')
+  var question_id = req.params.question_id;
+  var page = req.query.page ||1;
+  var count = req.query.count ||5;
+
+
+  Answers.find({question_id:question_id})
+  .skip((page-1)*count)
+  .limit(count)
+  .then((results)=>{res.json(results);console.log('success inside get answers')})
+  .catch(err=>res.status(500).send('err inside get answers'))
+
+
 })
 
 
