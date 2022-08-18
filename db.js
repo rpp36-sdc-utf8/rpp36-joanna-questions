@@ -14,6 +14,7 @@ const answersSchema = new mongoose.Schema({
   id:Number,
   body:String,
   date:{type : Date, default: Date.now},
+  question_id:Number,
   answerer_name:String,
   answerer_email:String,
   helpfulness:{type:Number,default:0},

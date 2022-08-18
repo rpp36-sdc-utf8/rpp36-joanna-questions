@@ -11,14 +11,38 @@ router.get('/qa/questions/:question_id/answers', (req, res) => {
   var page = req.query.page ||1;
   var count = req.query.count ||5;
 
+  Answers
+    .aggregate([
+      {
+      '$match': {
+        'question_id': parseInt(question_id)
+      }
+      }, {
+      '$skip': (page-1)*count
+      }, {
+      '$limit': count
+      }, {
+      '$lookup': {
+        'from': 'photos',
+        'localField': 'id',
+        'foreignField': 'answer_id',
+        'as': 'photos'
+      }
+      }
+    ])
+    .then((results)=>{
+      results.forEach((result)=>{
+        // console.log('result date'+typeof(result.date_written))
+        result.date = new Date(parseInt(result.date_written))
+      });
+      console.log('success inside get answers ')
+      res.json(results)})
+    .catch(err=>res.status(500).send('err inside get answers'))
 
-  Answers.find({question_id:question_id})
-  .skip((page-1)*count)
-  .limit(count)
-  .then((results)=>{res.json(results);console.log('success inside get answers')})
-  .catch(err=>res.status(500).send('err inside get answers'))
 
-
+    // .skip((page-1)*count)
+    // .limit(count)
+  // Answers.find({question_id:parseInt(question_id)})
 })
 
 
