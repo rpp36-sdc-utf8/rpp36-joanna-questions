@@ -3,19 +3,20 @@ const router = express.Router();
 const{Photos, Answers, Questions} =require('./db.js')
 
 router.get('/qa/questions',(req,res)=>{
-  var product_id,page,count =req.params.product_id;
-  var page =req.params.page || 1;
-  var count = req.params.count|| 5;
+  var product_id =req.query.product_id;
+  var page =parseInt(req.params.page) || 1;
+  var count = parseInt(req.params.count)|| 5;
+  console.log('product_id'+product_id)
   Questions
   .aggregate([
     {
       '$match': {
-        'product_id': 1
+        'product_id':parseInt(product_id)
       }
     }, {
-      '$skip': 0
+      '$skip': (page-1)*count
     }, {
-      '$limit': 5
+      '$limit': count
     }, {
       '$lookup': {
         'from': 'answers',
@@ -29,7 +30,7 @@ router.get('/qa/questions',(req,res)=>{
         'question_id': '$id',
         'product_id': 1,
         'date_written': 1,
-        'body': 1,
+        'question_body':"$body",
         'asker_name': 1,
         'reported': 1,
         'question_helpfulness': '$helpful',
@@ -59,25 +60,32 @@ router.get('/qa/questions',(req,res)=>{
     data.product_id = results[0].product_id;
     data.results=arr;
     results.forEach(result=>{
-      result.question_date = new Date(result.date_written)
+      var photoArr =[]
+      for(var key in result.answers){
+          if(result.answers[key].photos.length>0){
+              console.log(result.an)
+              result.answers[key].photos.forEach((file)=>{
+          photoArr.push(file.url)
+        })
+        result.answers[key].photos=photoArr;
+      }
+
+          }
+
       arr.push(result)
     })
-
 
     console.log('succes inside questions '),res.json(data)})
   .catch(err=>res.status(500).send('err inside get questions'))
 
-
-
-
-
   // res.send('Get all questions')
 
 })
-router.get('/qa/questions/:question_id/answers', (req, res) => {
-  var question_id = req.params.question_id;
-  var page = req.query.page ||1;
-  var count = req.query.count ||5;
+router.get('/qa/questions/:qId/answers', (req, res) => {
+  var question_id = req.params.qId;
+  var page = parseInt(req.query.page )||1;
+  var count = parseInt(req.query.count) ||5;
+  console.log('question id in answers'+page)
 
   Answers
     .aggregate([
@@ -88,16 +96,36 @@ router.get('/qa/questions/:question_id/answers', (req, res) => {
       }, {
       '$skip': (page-1)*count
       }, {
-      '$limit': count
-      }
+      '$limit':count
+      },
+      {
+        '$project': {
+            'answer_id': '$id',
+            'question_id':1,
+            'body': 1,
+            'answerer_name': 1,
+            'helpfulness': '$helpful',
+            'photos': 1,
+            'date': '$date_written'
+        }
+    }
     ])
     .then((results)=>{
-      results.forEach((result)=>{
-        // console.log('result date'+typeof(result.date_written))
-        result.date = new Date(parseInt(result.date_written))
-      });
+
+      var data ={};
+      data.questions= results[0].question_id
+      var arr=[];
+    if(results.length>0){
+        results.forEach((result=>{
+        result.date = new Date(parseInt(result.date));
+
+        arr.push(result)
+    }))
+
+    }
+      data.results =arr
       console.log('success inside get answers ')
-      res.json(results)})
+      res.json(data)})
     .catch(err=>res.status(500).send('err inside get answers'))
 
 
@@ -127,5 +155,9 @@ router.get('/qa/questions/:question_id/answers', (req, res) => {
 //     err ? res.sendStatus(500) : res.json(data);
 //   });
 // });
+router.post('/qa/questions',(req,res)=>{
+  console.log('req'+req.data.product_id)
+  res.send('hello post')
 
+})
 module.exports = router
