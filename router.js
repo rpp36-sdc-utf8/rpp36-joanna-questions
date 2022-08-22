@@ -160,4 +160,33 @@ router.post('/qa/questions',(req,res)=>{
   res.send('hello post')
 
 })
+
+router.put('/qa/questions/:question_id/report',(req,res)=>{
+  var question_id = parseInt(req.params.question_id);
+  console.log('questions report'+typeof(question_id))
+  Questions.aggregate([
+    {
+      '$match': {
+        'id': question_id
+      }
+    }, {
+      '$set': {
+        'reported': {
+          '$eq': [
+            false, '$reported'
+          ]
+        }
+      }
+    }, {
+      '$merge': {
+        'into': 'questions',
+        'on': '_id',
+        'whenMatched': 'replace'
+      }
+    }
+  ])
+  .then((result)=>{res.status(204).send();console.log('success reported questions')})
+  .catch((err)=>{res.status(500).send('err inside report questions');console.log(err)})
+
+})
 module.exports = router
