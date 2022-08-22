@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1661145679002" clover="3.2.0">
-  <project timestamp="1661145679002" name="All files">
-    <metrics statements="66" coveredstatements="27" conditionals="12" coveredconditionals="0" methods="14" coveredmethods="1" elements="92" coveredelements="28" complexity="0" loc="66" ncloc="66" packages="1" files="3" classes="3"/>
+<coverage generated="1661150710891" clover="3.2.0">
+  <project timestamp="1661150710891" name="All files">
+    <metrics statements="66" coveredstatements="62" conditionals="12" coveredconditionals="11" methods="14" coveredmethods="9" elements="92" coveredelements="82" complexity="0" loc="66" ncloc="66" packages="1" files="3" classes="3"/>
     <file name="db.js" path="/Users/mango/work/sdc/rpp36-joanna-questions/db.js">
       <metrics statements="11" coveredstatements="11" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
       <line num="1" count="1" type="stmt"/>
@@ -17,47 +17,47 @@
       <line num="43" count="1" type="stmt"/>
     </file>
     <file name="router.js" path="/Users/mango/work/sdc/rpp36-joanna-questions/router.js">
-      <metrics statements="45" coveredstatements="7" conditionals="12" coveredconditionals="0" methods="10" coveredmethods="0"/>
+      <metrics statements="45" coveredstatements="41" conditionals="12" coveredconditionals="11" methods="10" coveredmethods="7"/>
       <line num="1" count="1" type="stmt"/>
       <line num="2" count="1" type="stmt"/>
       <line num="3" count="1" type="stmt"/>
       <line num="5" count="1" type="stmt"/>
-      <line num="6" count="0" type="stmt"/>
-      <line num="7" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="8" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="9" count="0" type="stmt"/>
-      <line num="10" count="0" type="stmt"/>
-      <line num="58" count="0" type="stmt"/>
-      <line num="59" count="0" type="stmt"/>
-      <line num="60" count="0" type="stmt"/>
-      <line num="61" count="0" type="stmt"/>
-      <line num="62" count="0" type="stmt"/>
-      <line num="63" count="0" type="stmt"/>
-      <line num="64" count="0" type="stmt"/>
-      <line num="65" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="66" count="0" type="stmt"/>
-      <line num="67" count="0" type="stmt"/>
-      <line num="68" count="0" type="stmt"/>
-      <line num="70" count="0" type="stmt"/>
-      <line num="75" count="0" type="stmt"/>
-      <line num="78" count="0" type="stmt"/>
+      <line num="6" count="1" type="stmt"/>
+      <line num="7" count="1" type="cond" truecount="2" falsecount="0"/>
+      <line num="8" count="1" type="cond" truecount="2" falsecount="0"/>
+      <line num="9" count="1" type="stmt"/>
+      <line num="10" count="1" type="stmt"/>
+      <line num="58" count="1" type="stmt"/>
+      <line num="59" count="1" type="stmt"/>
+      <line num="60" count="1" type="stmt"/>
+      <line num="61" count="1" type="stmt"/>
+      <line num="62" count="1" type="stmt"/>
+      <line num="63" count="5" type="stmt"/>
+      <line num="64" count="5" type="stmt"/>
+      <line num="65" count="17" type="cond" truecount="2" falsecount="0"/>
+      <line num="66" count="3" type="stmt"/>
+      <line num="67" count="3" type="stmt"/>
+      <line num="68" count="6" type="stmt"/>
+      <line num="70" count="3" type="stmt"/>
+      <line num="75" count="5" type="stmt"/>
+      <line num="78" count="1" type="stmt"/>
       <line num="79" count="0" type="stmt"/>
       <line num="84" count="1" type="stmt"/>
-      <line num="85" count="0" type="stmt"/>
-      <line num="86" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="87" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="88" count="0" type="stmt"/>
-      <line num="90" count="0" type="stmt"/>
-      <line num="115" count="0" type="stmt"/>
-      <line num="116" count="0" type="stmt"/>
-      <line num="117" count="0" type="stmt"/>
-      <line num="118" count="0" type="cond" truecount="0" falsecount="2"/>
-      <line num="119" count="0" type="stmt"/>
-      <line num="120" count="0" type="stmt"/>
-      <line num="122" count="0" type="stmt"/>
-      <line num="126" count="0" type="stmt"/>
-      <line num="127" count="0" type="stmt"/>
-      <line num="128" count="0" type="stmt"/>
+      <line num="85" count="1" type="stmt"/>
+      <line num="86" count="1" type="cond" truecount="2" falsecount="0"/>
+      <line num="87" count="1" type="cond" truecount="2" falsecount="0"/>
+      <line num="88" count="1" type="stmt"/>
+      <line num="90" count="1" type="stmt"/>
+      <line num="115" count="1" type="stmt"/>
+      <line num="116" count="1" type="stmt"/>
+      <line num="117" count="1" type="stmt"/>
+      <line num="118" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="119" count="1" type="stmt"/>
+      <line num="120" count="5" type="stmt"/>
+      <line num="122" count="5" type="stmt"/>
+      <line num="126" count="1" type="stmt"/>
+      <line num="127" count="1" type="stmt"/>
+      <line num="128" count="1" type="stmt"/>
       <line num="129" count="0" type="stmt"/>
       <line num="158" count="1" type="stmt"/>
       <line num="159" count="0" type="stmt"/>
@@ -65,7 +65,7 @@
       <line num="163" count="1" type="stmt"/>
     </file>
     <file name="server.js" path="/Users/mango/work/sdc/rpp36-joanna-questions/server.js">
-      <metrics statements="10" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
       <line num="1" count="1" type="stmt"/>
       <line num="2" count="1" type="stmt"/>
       <line num="4" count="1" type="stmt"/>
@@ -74,7 +74,7 @@
       <line num="7" count="1" type="stmt"/>
       <line num="8" count="1" type="stmt"/>
       <line num="10" count="1" type="stmt"/>
-      <line num="11" count="0" type="stmt"/>
+      <line num="11" count="1" type="stmt"/>
       <line num="15" count="1" type="stmt"/>
     </file>
   </project>
