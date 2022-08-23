@@ -29,7 +29,7 @@ router.get('/qa/questions',(req,res)=>{
         '_id': 0,
         'question_id': '$id',
         'product_id': 1,
-        'date_written': 1,
+        'question_date': 1,
         'question_body':"$body",
         'asker_name': 1,
         'reported': 1,
@@ -61,10 +61,14 @@ router.get('/qa/questions',(req,res)=>{
     data.results=arr;
     results.forEach(result=>{
       var photoArr =[]
+      result.question_date = new Date(parseInt(result.question_date))
       for(var key in result.answers){
+            result.answers[key].date = new Date(parseInt(result.answers[key].date))
+
           if(result.answers[key].photos.length>0){
-              console.log(result.an)
+
               result.answers[key].photos.forEach((file)=>{
+
           photoArr.push(file.url)
         })
         result.answers[key].photos=photoArr;
@@ -85,7 +89,7 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
   var question_id = req.params.qId;
   var page = parseInt(req.query.page )||1;
   var count = parseInt(req.query.count) ||5;
-  console.log('question id in answers'+page)
+  // console.log('question id in answers'+page)
 
   Answers
     .aggregate([
@@ -106,7 +110,7 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
             'answerer_name': 1,
             'helpfulness': 1,
             'photos': 1,
-            'date': '$date_written'
+            'date': 1,
         }
     }
     ])
@@ -133,11 +137,7 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
 })
 
 
-router.post('/qa/questions',(req,res)=>{
-  console.log('req'+req.data.product_id)
-  res.send('hello post')
 
-})
 
 router.put('/qa/questions/:question_id/report',(req,res)=>{
   var question_id = parseInt(req.params.question_id);
@@ -228,6 +228,40 @@ router.put('/qa/questions/:question_id/helpful',(req,res)=>{
   })
 
 })
-// router.post('')
+router.post('/qa/questions',(req,res)=>{
+  var body= req.body.body;
+  var asker_name = req.body.name;
+  var asker_email =req.body.email;
+  var product_id = parseInt(req.body.product_id);
+
+
+  Questions.create({product_id:product_id,body:body,
+  asker_email:asker_email,asker_name:asker_name,question_date: new Date().getTime()})
+  .then(()=>{
+    res.status(201).send()
+  })
+  .catch((err)=>{
+    res.status(500).send('err post a question');console.log(err)
+  })
+
+})
+router.post('/qa/questions/:question_id/answers',(req,res)=>{
+  var body= req.body.body;
+  var answerer_name = req.body.name;
+  var answerer_email =req.body.email;
+  var photos=req.body.photos;
+  var question_id = parseInt(req.params.question_id);
+
+
+  Answers.create({question_id:question_id,body:body,
+  answerer_email:answerer_email,answerer_name:answerer_name,photos:photos,date: new Date().getTime()})
+  .then(()=>{
+    res.status(201).send()
+  })
+  .catch((err)=>{
+    res.status(500).send('err post a answer');console.log(err)
+  })
+
+})
 
 module.exports = router
