@@ -218,19 +218,16 @@ router.put('/qa/answers/:answer_id/helpful',async(req,res)=>{
 // put question helpful
 
 })
-router.put('/qa/questions/:question_id/helpful',async(req,res)=>{
+router.put('/qa/questions/:question_id/helpful',(req,res)=>{
   var question_id = parseInt(req.params.question_id);
   console.log('questions report'+question_id);
-  try{
-
-    await Questions.updateOne({id:question_id},{$inc:{question_helpfulness:1}})
-    res.status(204).send();console.log('success helpful questions')
-
-  }catch(err){
+  Questions.updateOne({id:question_id},{$inc:{question_helpfulness:1}})
+  .then(()=>{res.status(204).send();console.log('success helpful questions')})
+  .catch((err)=>{
     res.status(500).send('err inside helpful exec question');console.log(err)
-  }
+  })
 
 })
-
+// router.post('')
 
 module.exports = router
