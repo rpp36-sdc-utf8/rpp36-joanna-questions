@@ -33,7 +33,7 @@ router.get('/qa/questions',(req,res)=>{
         'question_body':"$body",
         'asker_name': 1,
         'reported': 1,
-        'question_helpfulness': '$helpful',
+        'question_helpfulness': 1,
         'answers': {
           '$arrayToObject': {
             '$map': {
@@ -104,7 +104,7 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
             'question_id':1,
             'body': 1,
             'answerer_name': 1,
-            'helpfulness': '$helpful',
+            'helpfulness': 1,
             'photos': 1,
             'date': '$date_written'
         }
@@ -129,32 +129,10 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
     .catch(err=>res.status(500).send('err inside get answers'))
 
 
-    // .skip((page-1)*count)
-    // .limit(count)
-  // Answers.find({question_id:parseInt(question_id)})
+
 })
 
 
-//GET /qa/questions/:question_id/answers
-//page count question_id
-// app.get('/answers/:qId', (req, res) => {
-//   apiReq({
-//     url: `${BASEURL}/qa/questions/${req.params.qId}/answers`,
-//     headers: options.headers,
-//     params: req.query
-//   }, (err, data) => {
-//     err ? res.sendStatus(500) : res.json(data);
-//   });
-// })//product_id page count
-// //app.get('/questions', (req, res) => {
-//   apiReq({
-//     url: `${BASEURL}/qa/questions`,
-//     headers: options.headers,
-//     params: req.query
-//   }, (err, data) => {
-//     err ? res.sendStatus(500) : res.json(data);
-//   });
-// });
 router.post('/qa/questions',(req,res)=>{
   console.log('req'+req.data.product_id)
   res.send('hello post')
@@ -217,5 +195,42 @@ router.put('/qa/answers/:answer_id/report',(req,res)=>{
   .catch((err)=>{res.status(500).send('err inside report answers');console.log(err)})
 
 })
+
+router.put('/qa/answers/:answer_id/helpful',async(req,res)=>{
+  var answer_id = parseInt(req.params.answer_id);
+  console.log('questions report'+answer_id);
+  try{
+    await Answers.updateOne({id:answer_id},{$inc:{helpfulness:1}})
+    res.status(204).send();console.log('success helpful answer')
+
+  }catch(err){
+    res.status(500).send('err inside helpful exec answers');console.log(err)
+  }
+  // Answers.updateOne({id:answer_id},{$inc:{'answers.helpful':1}})
+  // .exec((err,result)=>{
+  //   if(err){
+  //     res.status(500).send('err inside helpful exec answers');console.log(err)
+  //   }else{
+  //     res.status(204).send();console.log('success helpful questions')
+  //   }
+  // })
+
+// put question helpful
+
+})
+router.put('/qa/questions/:question_id/helpful',async(req,res)=>{
+  var question_id = parseInt(req.params.question_id);
+  console.log('questions report'+question_id);
+  try{
+
+    await Questions.updateOne({id:question_id},{$inc:{question_helpfulness:1}})
+    res.status(204).send();console.log('success helpful questions')
+
+  }catch(err){
+    res.status(500).send('err inside helpful exec question');console.log(err)
+  }
+
+})
+
 
 module.exports = router
