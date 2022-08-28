@@ -4,9 +4,9 @@ const{Photos, Answers, Questions} =require('./db.js')
 
 router.get('/qa/questions',(req,res)=>{
   var product_id =req.query.product_id;
-  var page =parseInt(req.params.page) || 1;
-  var count = parseInt(req.params.count)|| 5;
-  console.log('product_id'+product_id)
+  var page =parseInt(req.query.page) || 1;
+  var count = parseInt(req.query.count)|| 5;
+  console.log('count'+count)
   Questions
   .aggregate([
     {
@@ -233,15 +233,20 @@ router.post('/qa/questions',(req,res)=>{
   var asker_name = req.body.name;
   var asker_email =req.body.email;
   var product_id = parseInt(req.body.product_id);
+  var id
+  Questions.find({}).sort({id:-1}).limit(1)
+  .then((result)=>{
+    console.log('result qa'+ result[0].id)
+    id = result[0].id+1;
+    Questions.create({product_id:product_id,body:body,
+      asker_email:asker_email,asker_name:asker_name,id:id, question_date: new Date().getTime()})
+      .then(()=>{
+        res.status(201).send()
+      })
+      .catch((err)=>{
+        res.status(500).send('err post a question');console.log(err)
+      })
 
-
-  Questions.create({product_id:product_id,body:body,
-  asker_email:asker_email,asker_name:asker_name,question_date: new Date().getTime()})
-  .then(()=>{
-    res.status(201).send()
-  })
-  .catch((err)=>{
-    res.status(500).send('err post a question');console.log(err)
   })
 
 })
@@ -251,17 +256,76 @@ router.post('/qa/questions/:question_id/answers',(req,res)=>{
   var answerer_email =req.body.email;
   var photos=req.body.photos;
   var question_id = parseInt(req.params.question_id);
+  var answer_id;
+  var id;
+
+  if (photos.length===0){
+    Answers.find({}).sort({id:-1}).limit(1)
+    .then((result)=>{
+      console.log('result qa'+ result[0].id)
+      id = result[0].id+1;
+      Answers.create({question_id:question_id,body:body,
+        answerer_email:answerer_email,answerer_name:answerer_name,id:id,photos:photos, date: new Date().getTime()})
+        .then(()=>{
+          console.log('success post answer without photos');
+          res.status(201).send()
+        })
+        .catch((err)=>{
+          res.status(500).send('err post a question');console.log(err)
+        })
+
+    })
+    .catch((err)=>{ res.status(500).send('err post a answer1-1');console.log(err)})
 
 
-  Answers.create({question_id:question_id,body:body,
-  answerer_email:answerer_email,answerer_name:answerer_name,photos:photos,date: new Date().getTime()})
-  .then(()=>{
-    res.status(201).send()
+  }else{
+    Photos.find({}).sort({id:-1}).limit(1)
+    .then((data)=>{console.log('data  '+data[0].id); answer_id = data.id;
+    photos = photos.map((photo) => {
+      return {
+      url: photo,
+      answer_id:answer_id
+      }
+    )
+    Answers.find({}).sort({id:-1}).limit(1)
+    .then((result)=>{console.log('result qa'+ result[0].id);
+      id = result[0].id+1;
+      Answers.create({question_id:question_id,body:body,
+        answerer_email:answerer_email,answerer_name:answerer_name,id:id,photos:photos, date: new Date().getTime()}))
+
+      })
+
+    id = result[0].id+1;
+    Answers.create({question_id:question_id,body:body,
+      answerer_email:answerer_email,answerer_name:answerer_name,id:id,photos:photos, date: new Date().getTime()}))
+    .then(()=>{
+      Answers.find({}).sort({id:-1}).limit(1)
+      .then(
+        (data)=>{console.log('data  '+data[0].id); answer_id = data.id;
+        photos = photos.map((photo) => {
+          return {
+          url: photo,
+          answer_id:answer_id
+        };
+        })
+        Photos.insertMany(photos)
+        .then(()=>{
+          Answers.find({id:answer_id}).populate('photos','url id')
+          .then(()=>{
+          console.log('success post answer with photos')
+          })
+        .catch(()=>{
+           res.status(500).send('err post a answer2');console.log(err)
+
+        })
+      })
+      .catch((err)=> {res.status(500).send('err post a answer3');console.log(err)})
+
+
+    })
   })
-  .catch((err)=>{
-    res.status(500).send('err post a answer');console.log(err)
-  })
+  .catch((err)=> {res.status(500).send('err post a answer4');console.log(err)})
 
-})
+}})
 
 module.exports = router

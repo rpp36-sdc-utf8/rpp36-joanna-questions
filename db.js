@@ -19,18 +19,17 @@ const answersSchema = new mongoose.Schema({
   answerer_email:String,
   helpfulness:{type:Number,default:0},
   reported:{type: Boolean, default:false},
-  photos:[],
+  photos:[photosSchema],
 })
 const questionsSchema = new mongoose.Schema({
   product_id:Number,
-  question_id:Number,
-  question_body:String,
+  id:Number,
+  body:String,
   question_date:String,
   asker_name:String,
   asker_email:String,
   question_helpfulness:{type:Number,default:0},
   reported:{type: Boolean, default:false},
-  answers:[answersSchema],
 });
 const Photos = mongoose.model("Photos",photosSchema);
 const Answers = mongoose.model('Answers',answersSchema);
