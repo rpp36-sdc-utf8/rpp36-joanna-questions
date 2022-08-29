@@ -280,17 +280,41 @@ router.post('/qa/questions/:question_id/answers',async(req,res)=>{
         })
     }else{
       var photosResult = await Photos.find({}).sort({id:-1}).limit(1).exec()
-      var photoId = photosResult[0].id
+      var photoId = photosResult[0].id+1
       console.log('photoId'+ photoId)
+      photos = photos.map((photo) => {
+        photoId = photoId+1
+        console.log('photoID'+photoId)
+        return {
+        url: photo,
+        id:photoId,
+        answer_id:answer_id
+      };
+    })
+      var photoData = await Photos.insertMany(photos)
+      console.log(photoData)
+      photoData = photoData.map((photo) => {
+        return {
+        url: photo.url,
+        id:photo.id
+      };
+    })
+      Answers.create({question_id:question_id,body:body,
+        answerer_email:answerer_email,answerer_name:answerer_name,id:answer_id,photos:photoData, date: new Date().getTime()},function (err, result) {
+          if (err) {
+          res.status(500).send('err post a question');console.log(err)
 
-      Photos.insertMany()
+          }else{
+          console.log('success post answer with photos');
+          res.status(201).send()
+          }
+
+        })
 
 
-    }
 
 
-
-  }catch(err){
+  }}catch(err){
     res.status(500).send()
     console.log(err)
 
