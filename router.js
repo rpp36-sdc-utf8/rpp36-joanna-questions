@@ -250,82 +250,52 @@ router.post('/qa/questions',(req,res)=>{
   })
 
 })
-router.post('/qa/questions/:question_id/answers',(req,res)=>{
+
+router.post('/qa/questions/:question_id/answers',async(req,res)=>{
   var body= req.body.body;
   var answerer_name = req.body.name;
   var answerer_email =req.body.email;
   var photos=req.body.photos;
   var question_id = parseInt(req.params.question_id);
-  var answer_id;
-  var id;
 
-  if (photos.length===0){
-    Answers.find({}).sort({id:-1}).limit(1)
-    .then((result)=>{
-      console.log('result qa'+ result[0].id)
-      id = result[0].id+1;
+
+  try{
+    var answerResult = await Answers.find({}).sort({id:-1}).limit(1).exec()
+    console.log('anwerResult'+answerResult)
+
+    var answer_id = answerResult[0].id+1
+    console.log('answerId'+answer_id )
+
+    if (photos.length===0){
       Answers.create({question_id:question_id,body:body,
-        answerer_email:answerer_email,answerer_name:answerer_name,id:id,photos:photos, date: new Date().getTime()})
-        .then(()=>{
-          console.log('success post answer without photos');
-          res.status(201).send()
-        })
-        .catch((err)=>{
-          res.status(500).send('err post a question');console.log(err)
-        })
+        answerer_email:answerer_email,answerer_name:answerer_name,id:answer_id,photos:photos, date: new Date().getTime()},function (err, result) {
+          if (err) {
+            res.status(500).send('err post a question');console.log(err)
 
-    })
-    .catch((err)=>{ res.status(500).send('err post a answer1-1');console.log(err)})
-
-
-  }else{
-    Photos.find({}).sort({id:-1}).limit(1)
-    .then((data)=>{console.log('data  '+data[0].id); answer_id = data.id;
-    photos = photos.map((photo) => {
-      return {
-      url: photo,
-      answer_id:answer_id
-      }
-    )
-    Answers.find({}).sort({id:-1}).limit(1)
-    .then((result)=>{console.log('result qa'+ result[0].id);
-      id = result[0].id+1;
-      Answers.create({question_id:question_id,body:body,
-        answerer_email:answerer_email,answerer_name:answerer_name,id:id,photos:photos, date: new Date().getTime()}))
-
-      })
-
-    id = result[0].id+1;
-    Answers.create({question_id:question_id,body:body,
-      answerer_email:answerer_email,answerer_name:answerer_name,id:id,photos:photos, date: new Date().getTime()}))
-    .then(()=>{
-      Answers.find({}).sort({id:-1}).limit(1)
-      .then(
-        (data)=>{console.log('data  '+data[0].id); answer_id = data.id;
-        photos = photos.map((photo) => {
-          return {
-          url: photo,
-          answer_id:answer_id
-        };
-        })
-        Photos.insertMany(photos)
-        .then(()=>{
-          Answers.find({id:answer_id}).populate('photos','url id')
-          .then(()=>{
-          console.log('success post answer with photos')
-          })
-        .catch(()=>{
-           res.status(500).send('err post a answer2');console.log(err)
+          }else{
+            console.log('success post answer without photos');
+            res.status(201).send()
+          }
 
         })
-      })
-      .catch((err)=> {res.status(500).send('err post a answer3');console.log(err)})
+    }else{
+      var photosResult = await Photos.find({}).sort({id:-1}).limit(1).exec()
+      var photoId = photosResult[0].id
+      console.log('photoId'+ photoId)
+
+      Photos.insertMany()
 
 
-    })
-  })
-  .catch((err)=> {res.status(500).send('err post a answer4');console.log(err)})
+    }
 
-}})
+
+
+  }catch(err){
+    res.status(500).send()
+    console.log(err)
+
+
+  }
+})
 
 module.exports = router
