@@ -4,9 +4,9 @@ const{Photos, Answers, Questions} =require('./db.js')
 
 router.get('/qa/questions',(req,res)=>{
   var product_id =req.query.product_id;
-  var page =parseInt(req.params.page) || 1;
-  var count = parseInt(req.params.count)|| 5;
-  console.log('product_id'+product_id)
+  var page =parseInt(req.query.page) || 1;
+  var count = parseInt(req.query.count)|| 5;
+  console.log('count'+count)
   Questions
   .aggregate([
     {
@@ -233,19 +233,25 @@ router.post('/qa/questions',(req,res)=>{
   var asker_name = req.body.name;
   var asker_email =req.body.email;
   var product_id = parseInt(req.body.product_id);
+  var id
+  Questions.find({}).sort({id:-1}).limit(1)
+  .then((result)=>{
+    console.log('result qa'+ result[0].id)
+    id = result[0].id+1;
+    Questions.create({product_id:product_id,body:body,
+      asker_email:asker_email,asker_name:asker_name,id:id, question_date: new Date().getTime()})
+      .then(()=>{
+        res.status(201).send()
+      })
+      .catch((err)=>{
+        res.status(500).send('err post a question');console.log(err)
+      })
 
-
-  Questions.create({product_id:product_id,body:body,
-  asker_email:asker_email,asker_name:asker_name,question_date: new Date().getTime()})
-  .then(()=>{
-    res.status(201).send()
-  })
-  .catch((err)=>{
-    res.status(500).send('err post a question');console.log(err)
   })
 
 })
-router.post('/qa/questions/:question_id/answers',(req,res)=>{
+
+router.post('/qa/questions/:question_id/answers',async(req,res)=>{
   var body= req.body.body;
   var answerer_name = req.body.name;
   var answerer_email =req.body.email;
@@ -253,15 +259,67 @@ router.post('/qa/questions/:question_id/answers',(req,res)=>{
   var question_id = parseInt(req.params.question_id);
 
 
-  Answers.create({question_id:question_id,body:body,
-  answerer_email:answerer_email,answerer_name:answerer_name,photos:photos,date: new Date().getTime()})
-  .then(()=>{
-    res.status(201).send()
-  })
-  .catch((err)=>{
-    res.status(500).send('err post a answer');console.log(err)
-  })
+  try{
+    var answerResult = await Answers.find({}).sort({id:-1}).limit(1).exec()
+    console.log('anwerResult'+answerResult)
 
+    var answer_id = answerResult[0].id+1
+    console.log('answerId'+answer_id )
+
+    if (photos.length===0){
+      Answers.create({question_id:question_id,body:body,
+        answerer_email:answerer_email,answerer_name:answerer_name,id:answer_id,photos:photos, date: new Date().getTime()},function (err, result) {
+          if (err) {
+            res.status(500).send('err post a question');console.log(err)
+
+          }else{
+            console.log('success post answer without photos');
+            res.status(201).send()
+          }
+
+        })
+    }else{
+      var photosResult = await Photos.find({}).sort({id:-1}).limit(1).exec()
+      var photoId = photosResult[0].id+1
+      console.log('photoId'+ photoId)
+      photos = photos.map((photo) => {
+        photoId = photoId+1
+        console.log('photoID'+photoId)
+        return {
+        url: photo,
+        id:photoId,
+        answer_id:answer_id
+      };
+    })
+      var photoData = await Photos.insertMany(photos)
+      console.log(photoData)
+      photoData = photoData.map((photo) => {
+        return {
+        url: photo.url,
+        id:photo.id
+      };
+    })
+      Answers.create({question_id:question_id,body:body,
+        answerer_email:answerer_email,answerer_name:answerer_name,id:answer_id,photos:photoData, date: new Date().getTime()},function (err, result) {
+          if (err) {
+          res.status(500).send('err post a question');console.log(err)
+
+          }else{
+          console.log('success post answer with photos');
+          res.status(201).send()
+          }
+
+        })
+
+
+
+
+  }}catch(err){
+    res.status(500).send()
+    console.log(err)
+
+
+  }
 })
 
 module.exports = router
