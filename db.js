@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
+
+
 main().catch(err => console.log(err));
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/sdc',{ useUnifiedTopology: true, useNewUrlParser: true });
@@ -6,12 +9,17 @@ async function main() {
 
 
 const photosSchema = new mongoose.Schema({
-  id:Number,
+  id:{type: Number, unique: true},
   answer_id:Number,
   url:String,
 })
+
+photosSchema.plugin(AutoIncrement, {
+  inc_field: 'id',start_seq:2063760
+});
+const Photos = mongoose.model("Photos",photosSchema);
 const answersSchema = new mongoose.Schema({
-  id:Number,
+  answer_id:{type: Number, unique: true},
   body:String,
   date:Number,
   question_id:Number,
@@ -21,9 +29,14 @@ const answersSchema = new mongoose.Schema({
   reported:{type: Boolean, default:false},
   photos:[photosSchema],
 })
+
+answersSchema.plugin(AutoIncrement, {
+  inc_field: 'answer_id', start_seq: 6879307
+});
+const Answers = mongoose.model('Answers',answersSchema);
 const questionsSchema = new mongoose.Schema({
   product_id:Number,
-  id:Number,
+  question_id:{type: Number, unique: true},
   body:String,
   question_date:String,
   asker_name:String,
@@ -31,11 +44,15 @@ const questionsSchema = new mongoose.Schema({
   question_helpfulness:{type:Number,default:0},
   reported:{type: Boolean, default:false},
 });
-const Photos = mongoose.model("Photos",photosSchema);
-const Answers = mongoose.model('Answers',answersSchema);
+
+questionsSchema.plugin(AutoIncrement, {
+  inc_field: 'question_id', start_seq: 3518964
+});
 const Questions = mongoose.model('Questions',questionsSchema);
 
-let selectAnswers =()=>Answers.findOne();
+
+
+
 
 module.exports ={
   Photos,
