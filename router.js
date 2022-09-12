@@ -27,7 +27,7 @@ router.get('/qa/questions',(req,res)=>{
     }, {
       '$project': {
         '_id': 0,
-        'question_id': '$id',
+        'question_id': 1,
         'product_id': 1,
         'question_date': 1,
         'question_body':"$body",
@@ -55,31 +55,35 @@ router.get('/qa/questions',(req,res)=>{
     }
   ])
   .then(results=>{
+    console.log('results1'+results)
     var data ={};
     var arr =[];
     data.product_id = results[0].product_id;
     data.results=arr;
     results.forEach(result=>{
+      console.log('result'+result.question_date)
       var photoArr =[]
       result.question_date = new Date(parseInt(result.question_date))
       for(var key in result.answers){
+        console.log('key'+key)
+        console.log('resultkey'+result.answers[key].date)
+
             result.answers[key].date = new Date(parseInt(result.answers[key].date))
 
           if(result.answers[key].photos.length>0){
-
-              result.answers[key].photos.forEach((file)=>{
-
-          photoArr.push(file.url)
-        })
-        result.answers[key].photos=photoArr;
-      }
-
+            result.answers[key].photos.forEach((file)=>{
+              photoArr.push(file.url)
+            })
+            result.answers[key].photos=photoArr;
           }
 
+      }
+
       arr.push(result)
+      console.log('arr'+arr)
     })
 
-    console.log('succes inside questions '),res.json(data)})
+    console.log('succes inside questions '+data),res.json(data)})
   .catch(err=>res.status(500).send('err inside get questions'))
 
   // res.send('Get all questions')
@@ -104,7 +108,7 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
       },
       {
         '$project': {
-            'answer_id': '$id',
+            'answer_id': 1,
             'question_id':1,
             'body': 1,
             'answerer_name': 1,
@@ -131,9 +135,6 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
       console.log('success inside get answers ')
       res.json(data)})
     .catch(err=>res.status(500).send('err inside get answers'))
-
-
-
 })
 
 
@@ -233,23 +234,20 @@ router.post('/qa/questions',(req,res)=>{
   var asker_name = req.body.name;
   var asker_email =req.body.email;
   var product_id = parseInt(req.body.product_id);
-  var id
-  Questions.find({}).sort({id:-1}).limit(1)
-  .then((result)=>{
-    console.log('result qa'+ result[0].id)
-    id = result[0].id+1;
-    Questions.create({product_id:product_id,body:body,
-      asker_email:asker_email,asker_name:asker_name,id:id, question_date: new Date().getTime()})
-      .then(()=>{
-        res.status(201).send()
-      })
-      .catch((err)=>{
-        res.status(500).send('err post a question');console.log(err)
-      })
 
-  })
+
+  Questions.create({product_id:product_id,body:body,
+    asker_email:asker_email,asker_name:asker_name, question_date: new Date().getTime()})
+    .then(()=>{
+      res.status(201).send()
+    })
+    .catch((err)=>{
+      res.status(500).send('err post a question');console.log(err)
+    })
+
 
 })
+
 
 router.post('/qa/questions/:question_id/answers',async(req,res)=>{
   var body= req.body.body;
@@ -260,15 +258,11 @@ router.post('/qa/questions/:question_id/answers',async(req,res)=>{
 
 
   try{
-    var answerResult = await Answers.find({}).sort({id:-1}).limit(1).exec()
-    console.log('anwerResult'+answerResult)
-
-    var answer_id = answerResult[0].id+1
-    console.log('answerId'+answer_id )
 
     if (photos.length===0){
-      Answers.create({question_id:question_id,body:body,
-        answerer_email:answerer_email,answerer_name:answerer_name,id:answer_id,photos:photos, date: new Date().getTime()},function (err, result) {
+      Answers.create({
+        question_id:question_id,body:body,
+        answerer_email:answerer_email,answerer_name:answerer_name,photos:photos, date: new Date().getTime()},function (err, result) {
           if (err) {
             res.status(500).send('err post a question');console.log(err)
 
@@ -279,28 +273,32 @@ router.post('/qa/questions/:question_id/answers',async(req,res)=>{
 
         })
     }else{
-      var photosResult = await Photos.find({}).sort({id:-1}).limit(1).exec()
-      var photoId = photosResult[0].id+1
-      console.log('photoId'+ photoId)
-      photos = photos.map((photo) => {
-        photoId = photoId+1
-        console.log('photoID'+photoId)
-        return {
-        url: photo,
-        id:photoId,
-        answer_id:answer_id
-      };
-    })
-      var photoData = await Photos.insertMany(photos)
-      console.log(photoData)
-      photoData = photoData.map((photo) => {
-        return {
-        url: photo.url,
-        id:photo.id
-      };
-    })
+    //   var answerResult = await Answers.find({}).sort({answer_id:-1}).limit(1).exec()
+    //   var answer_id = answerResult[0].answer_id+1
+    //   // console.log('answer_id'+answer_id)
+    //   var photosResult = await Photos.find({}).sort({id:-1}).limit(1).exec()
+    //   var photoId = photosResult[0].id+1
+    //   // console.log('photoId'+ photoId)
+    //   photos = photos.map((photo) => {
+    //     photoId = photoId+1
+    //     // console.log('photoID'+photoId)
+    //     return {
+    //     url: photo,
+    //     id:photoId,
+    //     answer_id:answer_id
+    //   };
+    // })
+    //   var photoData = await Photos.insertMany(photos)
+    //   console.log(photoData)
+    //   photoData = photoData.map((photo) => {
+    //     return {
+    //     url: photo.url,
+    //     id:photo.id
+    //   };
+    // })
+
       Answers.create({question_id:question_id,body:body,
-        answerer_email:answerer_email,answerer_name:answerer_name,id:answer_id,photos:photoData, date: new Date().getTime()},function (err, result) {
+        answerer_email:answerer_email,answerer_name:answerer_name,photos:photos, date: new Date().getTime()},function (err, result) {
           if (err) {
           res.status(500).send('err post a question');console.log(err)
 
@@ -314,7 +312,7 @@ router.post('/qa/questions/:question_id/answers',async(req,res)=>{
 
 
 
-  }}catch(err){
+  }} catch(err){
     res.status(500).send()
     console.log(err)
 
@@ -323,3 +321,122 @@ router.post('/qa/questions/:question_id/answers',async(req,res)=>{
 })
 
 module.exports = router
+
+
+
+
+// [
+//   {
+//     '$project': {
+//       '_id': 1,
+//       'id': 1,
+//       'product_id': 1,
+//       'body': 1,
+//       'question_date': '$date_written',
+//       'asker_email': 1,
+//       'asker_name': 1,
+//       'reported': 1,
+//       'question_helpfulness': 1
+//     }
+//   }, {
+//     '$merge': {
+//       'into': 'questions',
+//       'on': '_id',
+//       'whenMatched': 'replace'
+//     }
+//   }
+// ]
+
+// {
+//   "_id": {
+//     "$oid": "62fb3a95167367696a233de1"
+//   },
+//   "id": 2,
+//   "product_id": 1,
+//   "body": "HEY THIS IS A WEIRD QUESTION!!!!?",
+//   "asker_name": "jbilas",
+//   "asker_email": "first.last@gmail.com",
+//   "reported": true,
+//   "question_helpfulness": 4,
+//   "question_date": "1613888219613"
+// }
+//{
+//   "_id": {
+//     "$oid": "62fb3b13167367696a3e673a"
+//   },
+//   "id": 1780059,
+//   "product_id": 506121,
+//   "body": "Illo enim quae enim voluptates explicabo sit nemo.",
+//   "date_written": "1614580519007",
+//   "asker_name": "Lucienne_Ernser",
+//   "asker_email": "Candido5@yahoo.com",
+//   "reported": true,
+//   "question_helpfulness": 28
+// }
+// //{
+//   "_id": {
+//     "$oid": "62fdd80e7aa3d2308c401977"
+//   },
+//   "id": 3476787,
+//   "question_id": 1780060,
+//   "body": "Vel nihil maxime eligendi et voluptate.",
+//   "date_written": 1617933132000,
+//   "answerer_name": "Delaney41",
+//   "answerer_email": "Seller",
+//   "reported": false,
+//   "helpful": 13
+// }
+
+// //{
+//   "_id": {
+//     "$oid": "63102e478a07b61cd8c162c6"
+//   },
+//   "id": 6879308,
+//   "body": "hellotestbody",
+//   "date": 1662004807114,
+//   "question_id": 1,
+//   "answerer_name": "helltestame",
+//   "answerer_email": "testemail@gmail.com",
+//   "helpfulness": 0,
+//   "reported": false,
+//   "photos": [
+//     {
+//       "id": 2063761,
+//       "url": "http:2313",
+//       "_id": {
+//         "$oid": "63102e478a07b61cd8c162c7"
+//       }
+//     },
+//     {
+//       "id": 2063762,
+//       "url": "http:5532",
+//       "_id": {
+//         "$oid": "63102e478a07b61cd8c162c8"
+//       }
+//     }
+//   ],
+//   "__v": 0
+// }
+
+// [
+//   {
+//     '$lookup': {
+//       'from': 'photos',
+//       'localField': 'id',
+//       'foreignField': 'answer_id',
+//       'as': 'photos'
+//     }
+//   }, {
+//     '$project': {
+//       'photos': {
+//         'answer_id': 0
+//       }
+//     }
+//   }, {
+//     '$merge': {
+//       'into': 'answers',
+//       'on': '_id',
+//       'whenMatched': 'replace'
+//     }
+//   }
+// ]
