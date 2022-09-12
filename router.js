@@ -135,9 +135,6 @@ router.get('/qa/questions/:qId/answers', (req, res) => {
       console.log('success inside get answers ')
       res.json(data)})
     .catch(err=>res.status(500).send('err inside get answers'))
-
-
-
 })
 
 
