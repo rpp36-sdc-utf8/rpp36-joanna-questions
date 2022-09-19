@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 
+
 main().catch(err => console.log(err));
 async function main() {
-  await mongoose.connect('mongodb://localhost:27017/sdc',{ useUnifiedTopology: true, useNewUrlParser: true });
+  // await mongoose.connect('mongodb://localhost:27017/sdc',{ useUnifiedTopology: true, useNewUrlParser: true });
+  await mongoose.connect('mongodb://user:password@54.215.236.181/sdc',{ useUnifiedTopology: true, useNewUrlParser: true });
 }
 
 
